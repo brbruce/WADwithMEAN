@@ -1,0 +1,91 @@
+{
+	"variables": [],
+	"info": {
+		"name": "WADWithMean book",
+		"_postman_id": "fd942fde-7fd9-49c4-7eb8-e939d190e36e",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add user",
+			"request": {
+				"url": "http://localhost:81/users",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\":\"ffff3\", \n\t\"lastName\":\"ffff3\",\n\t\"email\":\"eeee@example.com3\",\n\t\"username\":\"uuuu3\",\n\t\"password\":\"pppp3\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user",
+			"request": {
+				"url": "http://localhost:81/users/591fa746a00d658d31ac3405",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\":\"updated\", \n\t\"lastName\":\"metoo\"\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update user",
+			"request": {
+				"url": "http://localhost:81/users/591fa746a00d658d31ac3405",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\":\"nanana\", \n\t\"lastName\":\"nononon\"\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"request": {
+				"url": "http://localhost:81/users/591f95780c3fecec3068cbde",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\":\"updated\", \n\t\"lastName\":\"metoo\"\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
