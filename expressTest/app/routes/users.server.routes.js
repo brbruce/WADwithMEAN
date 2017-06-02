@@ -13,4 +13,13 @@ module.exports = function(app) {
     .delete(users.delete);  
 
   app.param('userId', users.userByID);
+
+  // Custom static find method
+  app.route('/usersByName/:username')
+    .get(users.read)
+    .put(users.update)
+    .delete(users.delete);  
+
+  app.param('username', users.findOneByUsername);
+
 };

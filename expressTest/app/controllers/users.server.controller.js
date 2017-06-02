@@ -58,3 +58,20 @@ exports.delete = function(req, res, next) {
     }
   })
 };
+
+// Define new controller method, which calls a custom schena method
+exports.findOneByUsername = function(req, res, next, aUsername) {
+	User.findOneByUsername(
+  	aUsername,
+  	function(err, user) {
+    if (err) {
+      return next(err);
+    } else {
+    	console.log('findOneByUsername3: ',user.username, user.id);
+      req.user = user;
+      next();
+    }
+  });
+};
+
+
