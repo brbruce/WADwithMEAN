@@ -9,7 +9,7 @@ var UserSchema = new Schema({
   	type: String,
   	index: true,
   	//match: /.+\@.+\..+/
-    match: [/.+\@.+\..+/, "Please fill a valid e-mail address"]  },
+    match: [/.+\@.+\..+/, "Please fill a valid e-mail address"]
   },
   username: {
   	type: String,
