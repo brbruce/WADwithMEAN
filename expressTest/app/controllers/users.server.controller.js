@@ -48,9 +48,11 @@ exports.read = function(req, res) {
   res.json(req.user);
 };
 
-exports.userByID = function(req, res, next, id) {
+exports.userByID = function(req, res, next, anID) {
+	console.log('userByID: anID: >',anID,"<");
+
   User.findOne({
-    _id: id
+    _id: anID
   }, function(err, user) {
     if (err) {
       return next(err);
@@ -149,4 +151,37 @@ exports.signout = function(req, res) {
   res.redirect('/');
 };
 
+// Added for OAuth logic
+exports.saveOAuthUserProfile = function(req, profile, done) {
+  User.findOne({
+    provider: profile.provider,
+    providerId: profile.providerId
+  }, function(err, user) {
+    if (err) {
+      return done(err);
+    } else {
+      if (!user) {
+        var possibleUsername = profile.username || ((profile.email) ? profile.email.split('@')[0] : '');
 
+        User.findUniqueUsername(possibleUsername, null, function(availableUsername) {
+          profile.username = availableUsername;
+
+          user = new User(profile);
+
+          user.save(function(err) {
+            if (err) {
+              var message = _this.getErrorMessage(err);
+
+              req.flash('error', message);
+              return res.redirect('/signup');
+            }
+
+            return done(err, user);
+          });
+        });
+      } else {
+        return done(err, user);
+      }
+    }
+  });
+};

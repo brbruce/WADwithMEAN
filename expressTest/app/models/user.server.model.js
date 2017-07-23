@@ -83,6 +83,7 @@ var UserSchema = new Schema({
 });
 
 // Not part of the schema.  Virtual.
+/*
 UserSchema.virtual('fullName').get(function() {
   return this.firstName + ' ' + this.lastName;
 }).set(function(fullName) {
@@ -90,6 +91,7 @@ UserSchema.virtual('fullName').get(function() {
   this.firstName = splitName[0] || ''; 
   this.lastName = splitName[1] || ''; 
 });
+*/
 
 /*
 // New custom static methods
