@@ -1,9 +1,11 @@
+// Invoke 'strict' JavaScript mode
+'use strict';
+
+// Set the 'development' environment configuration object
 module.exports = {
-  // Development configuration options
   sessionSecret: 'developmentSessionSecret',
   // Database
   db: 'mongodb://localhost/mean-book',
-  // FB login
   facebook: {
     clientID: '1833392170311738',
     clientSecret: '63658dc7b536a8ca57687b07666a8496',
