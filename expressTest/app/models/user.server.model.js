@@ -9,66 +9,22 @@ var mongoose = require('mongoose'),
 // Define a new 'UserSchema'
 var UserSchema = new Schema({
 	firstName: String,
-  lastName: String,
-  email: {
-  	type: String,
-	// Validate the email format
-	// My code	
-  	index: true,
-    match: [/.+\@.+\..+/, "Please fill a valid e-mail address"]
-  },
-  username: {
-  	type: String,
-	// Set a unique 'username' index
-  	unique: true,
-	// Validate 'username' value existance
-  	//required: true
-    required: 'Username is required',
-    // Trim the 'username' field
-    trim: true
-  },
-  /*
-  password: String,
-  created: {
-  	type: Date,
-	  default: Date.now,
-	  validate: [
-      function(password) {
-        return password.length >= 6;
-      },
-      'Password should be longer'
-    ]
-  },
-  website: {
-    type: String,
-    set: function(url) {
-      if (!url) {
-        return url;
-      } else {
-        if (url.indexOf('http://') !== 0   && url.indexOf('https://') !== 0) {
-          url = 'http://' + url;
-        }
-        return url;
-        }
-    },
-    get: function(url) {
-      if (!url) {
-        return url;
-      } else {
-				if (url.indexOf('http://') !== 0   && url.indexOf('https://') !== 0) {
-          url = 'http://' + url;
-        }
-        return url;
-     	}
-    }
-  },
-  role: {
-  	type: String,
-  	enum: ['Admin', 'Owner', 'User']
-  }
-});
-*/
-  password: {
+	lastName: String,
+	email: {
+		type: String,
+		// Validate the email format
+		match: [/.+\@.+\..+/, "Please fill a valid email address"]
+	},
+	username: {
+		type: String,
+		// Set a unique 'username' index
+		unique: true,
+		// Validate 'username' value existance
+		required: 'Username is required',
+		// Trim the 'username' field
+		trim: true
+	},
+	password: {
 		type: String,
 		// Validate the 'password' value length
 		validate: [
@@ -96,43 +52,22 @@ var UserSchema = new Schema({
 });
 
 // Set the 'fullname' virtual property
-// Not part of the schema.  Virtual.
-/*
 UserSchema.virtual('fullName').get(function() {
-  return this.firstName + ' ' + this.lastName;
+	return this.firstName + ' ' + this.lastName;
 }).set(function(fullName) {
-  var splitName = fullName.split(' '); 
-  this.firstName = splitName[0] || ''; 
-  this.lastName = splitName[1] || ''; 
+	var splitName = fullName.split(' ');
+	this.firstName = splitName[0] || '';
+	this.lastName = splitName[1] || '';
 });
-*/
-
-/*
-// New custom static methods
-// Ex.  New find methods
-UserSchema.statics.findOneByUsername_Class = function (aUsername, callback) {
-
-	console.log('findOneByUsername: ',aUsername);
-	console.log('findOneByUsername2: ',new RegExp(aUsername));
-
-	// Case insensitive
-  this.findOne({ username: new RegExp(aUsername, 'i') }, callback);
-};
-
-// Custome instance method
-UserSchema.methods.authenticate = function(password) {
-  return this.password === password;
-};
-*/
 
 // Use a pre-save middleware to hash the password
 UserSchema.pre('save', function(next) {
-  if (this.password) {
-    this.salt = new Buffer(crypto.randomBytes(16).toString('base64'), 'base64');
-    this.password = this.hashPassword(this.password);
-  }
+	if (this.password) {
+		this.salt = new Buffer(crypto.randomBytes(16).toString('base64'), 'base64');
+		this.password = this.hashPassword(this.password);
+	}
 
-  next();
+	next();
 });
 
 // Create an instance method for hashing a password

@@ -1,22 +1,23 @@
 // Invoke 'strict' JavaScript mode
 'use strict';
+
 // Load the module dependencies
 var User = require('mongoose').model('User'),
-  passport = require('passport');
+	passport = require('passport');
 
 // Create a new error handling controller method
 var getErrorMessage = function(err) {
 	// Define the error message variable
-  var message = '';
+	var message = '';
 
 	// If an internal MongoDB error occurs get the error message
-  if (err.code) {
-    switch (err.code) {
+	if (err.code) {
+		switch (err.code) {
 			// If a unique index error occurs set the message error
-      case 11000:
-      case 11001:
-        message = 'Username already exists';
-        break;
+			case 11000:
+			case 11001:
+				message = 'Username already exists';
+				break;
 			// If a general error occurs set the message error
 			default:
 				message = 'Something went wrong';
@@ -31,8 +32,6 @@ var getErrorMessage = function(err) {
 	// Return the message error
 	return message;
 };
-
-
 
 // Create a new controller method that renders the signin page
 exports.renderSignin = function(req, res, next) {
@@ -109,8 +108,8 @@ exports.signup = function(req, res, next) {
 exports.saveOAuthUserProfile = function(req, profile, done) {
 	// Try finding a user document that was registered using the current OAuth provider
 	User.findOne({
-    provider: profile.provider,
-    providerId: profile.providerId
+		provider: profile.provider,
+		providerId: profile.providerId
 	}, function(err, user) {
 		// If an error occurs continue to the next middleware
 		if (err) {
@@ -132,13 +131,9 @@ exports.saveOAuthUserProfile = function(req, profile, done) {
 					// Try saving the new user document
 					user.save(function(err) {
 						// Continue to the next middleware
-
-              req.flash('error', message);
-              return res.redirect('/signup');
-
-            return done(err, user);
-          });
-        });
+						return done(err, user);
+					});
+				});
 			} else {
 				// Continue to the next middleware
 				return done(err, user);
@@ -156,85 +151,12 @@ exports.signout = function(req, res) {
 	res.redirect('/');
 };
 
-//=====================================================
-// User methods.  
+exports.requiresLogin = function(req, res, next) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).send({
+      message: 'User is not logged in'
+    });
+  }
 
-exports.create = function(req, res, next) {
-  var user = new User(req.body);
-
-  user.save(function(err) {
-    if (err) {
-      return next(err);
-    } else {
-      res.json(user);
-    }
-  });
+  next();
 };
-
-exports.list = function(req, res, next) {
-  User.find({}, function(err, users) {
-    if (err) {
-      return next(err);
-    } else {
-      res.json(users);
-    }
-  });
-};
-
-exports.read = function(req, res) {
-  res.json(req.user);
-};
-
-exports.userByID = function(req, res, next, anID) {
-	console.log('userByID: anID: >',anID,"<");
-
-  User.findOne({
-    _id: anID
-  }, function(err, user) {
-    if (err) {
-      return next(err);
-    } else {
-      req.user = user;
-      next();
-    }
-  });
-};
-
-exports.update = function(req, res, next) {
-  User.findByIdAndUpdate(req.user.id, req.body, function(err, user) {
-    if (err) {
-      return next(err);
-    } else {
-      res.json(user);
-    }
-  });
-};
-
-exports.delete = function(req, res, next) {
-  req.user.remove(function(err) {
-    if (err) {
-      return next(err);
-    } else {
-      res.json(req.user);
-    }
-  })
-};
-
-// Define new controller method, which calls a custom schena method
-exports.findOneByUsername = function(req, res, next, aUsername) {
-	User.findOneByUsername(
-  	aUsername,
-  	function(err, user) {
-    if (err) {
-      return next(err);
-    } else {
-    	console.log('findOneByUsername3: ',user.username, user.id);
-      req.user = user;
-      next();
-    }
-  });
-};
-
-
-//=====================================================
-
