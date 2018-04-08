@@ -3,19 +3,26 @@
 
 // Load the module dependencies
 var config = require('./config'),
+	http = require('http'),
+	socketio = require('socket.io'),
 	express = require('express'),
 	morgan = require('morgan'),
 	compress = require('compression'),
 	bodyParser = require('body-parser'),
 	methodOverride = require('method-override'),
 	session = require('express-session'),
+	MongoStore = require('connect-mongo')(session),
 	flash = require('connect-flash'),
 	passport = require('passport');
 
 // Define the Express configuration method
-module.exports = function() {
+module.exports = function(db) {
+
 	// Create a new Express application instance
 	var app = express();
+
+	var server = http.createServer(app);
+	var io = socketio.listen(server);
 
 	// Use the 'NDOE_ENV' variable to activate the 'morgan' logger or 'compress' middleware
 	if (process.env.NODE_ENV === 'development') {
@@ -31,13 +38,30 @@ module.exports = function() {
 	app.use(bodyParser.json());
 	app.use(methodOverride());
 
+	/*
 	// Configure the 'session' middleware
+	// This section was making chat not connect for some reason.
+	// Not sure if it is because of the lack of mongoStore as tbe store.
 	app.use(session({
 		saveUninitialized: true,
 		resave: true,
 		secret: config.sessionSecret
 	}));
+	*/
+	
+	// Configure the MongoDB session storage
+	var mongoStore = new MongoStore({
+	  db: db.connection.db
+	});
 
+	// Configure the 'session' middleware
+	app.use(session({
+	  saveUninitialized: true,
+	  resave: true,
+	  secret: config.sessionSecret,
+	  store: mongoStore
+	}));
+  
 	// Set the application view engine and 'views' folder
 	app.set('views', './app/views');
 	app.set('view engine', 'ejs');
@@ -57,6 +81,9 @@ module.exports = function() {
 	// Configure static file serving
 	app.use(express.static('./public'));
 
+	require('./socketio')(server, io, mongoStore);
+
 	// Return the Express application instance
-	return app;
+	//return app;
+	return server;
 };

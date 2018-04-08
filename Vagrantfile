@@ -11,8 +11,8 @@ Vagrant.configure("2") do |config|
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "bentoUbuntu16.04Mean"
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "bentoUbuntu16.04Mean80"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -22,7 +22,13 @@ Vagrant.configure("2") do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
   # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -54,13 +60,6 @@ Vagrant.configure("2") do |config|
   # View the documentation for the provider you are using for more
   # information on available options.
 
-  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
-  # such as FTP and Heroku are also available. See the documentation at
-  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
-  # config.push.define "atlas" do |push|
-  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
-  # end
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -68,22 +67,4 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
-
-  #-------------
-  # BBRUCE - Sample of inline script with default user instead of root.
-  #-------------
-  $script = <<-SCRIPT
-    # BBRUCE - Only run the following commands on the very first vagrant up by checking a file
-    #if [ -f "/var/vagrant_provision" ]; then
-    #  exit 0
-    #fi
-
-    # Set timezone to EST
-    echo \"America/New_York\" | tee /etc/timezone && rm /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
-
-    # Set file flag on first execution only
-    touch /var/vagrant_provision
-  SCRIPT
-  config.vm.provision "shell", inline: $script
-
 end
