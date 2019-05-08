@@ -1,0 +1,565 @@
+Webdev Env Setup
+===========================
+Installed:
+Vagrant 1.9.3 (1/28/2018 - Updated to 2.0.1)
+VirtualBox 5.1.18 (1/28/2018 - Updated to 5.2.6)
+Cygwin - Need to install chere and ssh separately.  Also installed rsync, telnet (in net/inetutils), git, nano, curl, wget
+chere -i -t mintty
+
+Edit cygwin window options - 
+Window: Set window size to 120/55
+Mouse: Set right click to paste.  Make sure Copy on Select is checked.
+Looks: Cursor - Block, Blinking
+----------------------------
+Github client - Sourcetree
+
+github desktop for windows - git gui and command line (check git desktop folder for icons)
+Did not like GitHub desktop.  Too confusing.
+
+Atlassian SourceTree - 1.10.23.1
+Edit global options and set username and email
+Generated RSA key using cygwin ssh-keygen
+----------------------------
+Ssh key generation using Cygwin for SourceTree for GitHub
+ssh-keygen
+Save in C:\cygwin\home\publi\.ssh\id_rsa (passphr=J..)
+----------------------------
+ wget -q -S -O - http://localhost:3000
+ curl -i -S http://localhost:3000
+----------------------------
+
+----------------------------
+https://www.vagrantup.com/intro/getting-started/index.html
+
+
+
+Commandline sublime editor:
+Edit ~/.bash_aliases and create alias subl=sublime_text.exe:
+alias ls='ls -l'
+alias subl='/cygdrive/c/Program\ Files/Sublime\ Text\ 3/sublime_text.exe'
+alias edpl='/cygdrive/C/Program\ Files\ \(x86\)/EditPlus/editplus.exe'
+alias gowebdev='cd /cygdrive/c/Users/publi/OneDrive/Documents/webdev'
+
+
+Package upgrades as needed:
+sudo apt-get update        # Fetches the list of available updates
+sudo apt-get upgrade       # Strictly upgrades the current packages
+sudo apt-get dist-upgrade  # Installs updates (new ones)
+sudo apt-get autoremove    # Remove unused dependencies
+sudo apt-get clean         # Clean downloaded package files from /var/cache/apt/archives
+sudo reboot
+apt list --installed
+
+------------------
+======================
+Vagrant tips:
+======================
+vagrant init hashicorp/precise64 - install 
+vagrant up
+vagrant ssh
+vagrant suspend
+vagrant halt
+vagrant provision - reconfigure from settings
+vagrant reload - after network or shared folder settings
+vagrant destroy - only removes vm instance.  Can rebuild with 'vagrant up'
+vagrant share - create temporary URL
+
+mkdir vagrant_getting_started
+cd vagrant_getting_started
+vagrant init
+
+vagrant box add hashicorp/precise64
+
+vagrant global-status
+vagrant destroy <id>
+vagrant reload - Halts and restart vm with new settings
+vagrant reload --provision - Reprovision
+
+
+# BUG - Vagrantfile forward_port - needs host_ip setting
+config.vm.network :forwarded_port, guest: 80, host: 4567, host_ip: "127.0.0.1"
+
+vagrant box list - List of all boxes available.
+
+Atlas - https://atlas.hashicorp.com
+
+Global web and ssl or port access
+vagrant login - bbruce/
+<start vagrant>
+vagrant share <- get URL
+
+vagrant share --ssl <- create password for ssl access
+vagrant connect --ssh <sharename>
+
+vagrant share --disable-http
+vagrant connect <sharename>
+
+
+Location of downloaded box files: C:\Users\publi\.vagrant.d\boxes\
+Location of included file in a box: 
+C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean3\0\virtualbox\include
+
+Install packages while running in Cygwin as Administrator because of symlink creation error.
+Can run as normal user afterwards.
+
+Cannot see running boxes when running as administrator vs normal user.
+
+#-----------------------------------------
+# Installation with 16.04
+#-----------------------------------------
+
+Mean stack with Ubuntu 16.04 (xenial)
+
+# NOTE: Vagrant recommends running bento boxes instead of ubuntu official.  The Bento boxes are minimized, and support multiple providers.
+# ubuntu releases support only virtualbox and are full releases.
+# vagrant init ubuntu/trusty64
+
+vagrant init bento/ubuntu-16.04; vagrant up --provider virtualbox
+
+vagrant up
+vagrant ssh
+  lsb_release -a <--- Command to get ubuntu version
+  No LSB modules are available.
+  Distributor ID: Ubuntu
+  Description:    Ubuntu 16.04.2 LTS
+  Release:        16.04
+  Codename:       xenial
+
+#-----------------------------------------
+# Install g++ (Required for npm install of mongoose.js 4.x)
+#-----------------------------------------
+sudo apt-get install g++
+
+???? sudo apt-get install -y python-software-properties python g++ make
+
+
+
+#-----------------------------------------
+# Install git if nec
+#-----------------------------------------
+sudo apt-get install git
+  git is already the newest version (1:2.7.4-0ubuntu1).
+  git --version
+  git version 2.7.4
+
+#-----------------------------------------
+# Install Node
+#-----------------------------------------
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+  node -v
+  v6.10.2
+
+  npm -v
+  3.10.10
+
+
+
+???? sudo add-apt-repository ppa:chris-lea/node.js --- Is this deprecated?
+
+#-----------------------------------------
+# Install Mongodb - Current stable = 3.4.4
+#-----------------------------------------
+# See https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo service mongod start <--- This needs to be done as part of startup.  See below.
+
+  mongo
+  MongoDB shell version v3.4.4
+  connecting to: mongodb://127.0.0.1:27017
+  MongoDB server version: 3.4.4
+
+#-----------------------------------------
+# Installing node modules globally (-g):
+#
+# bower
+# grunt
+# yeoman
+# meanjs.org
+#-----------------------------------------
+sudo npm install -g bower grunt-cli yo generator-meanjs
+
+  Yeoman Doctor
+  Running sanity checks on your system
+
+  * Global configuration file is valid
+  * NODE_PATH matches the npm root
+  * Node.js version
+  * No .bowerrc file in home directory
+  * No .yo-rc.json file in home directory
+  * npm version
+
+  Everything looks all right!
+
+  yo --version
+  1.8.5
+
+  bower --version
+  1.8.0
+
+  grunt --version
+  grunt-cli v1.2.0
+
+Looks good!!
+
+NOTE:  bower webpage says you should move to yarn and webpack.  Research later.
+
+#-----------------------------------------
+#-----------------------------------------
+# Package server as vagrant box
+#-----------------------------------------
+#-----------------------------------------
+
+Packaging:
+
+# First clean up the APT cache and disk and bash history
+rm /var/vagrant_provision
+sudo apt-get clean
+sudo dd if=/dev/zero of=/EMPTY bs=1M
+sudo rm -f /EMPTY
+cat /dev/null > ~/.bash_history && history -c && exit
+
+vagrant package --vagrantfile ./Vagrantfile  --include bootstrap.sh 
+
+NOTE: Included files are stored in the packaged box directory under ./include.
+Ex. C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean3\0\virtualbox\include
+The edited Vagrantfile is default in the box (but a new template file is aways included after vagrant init is run.
+To access the bootstrap.sh file from the Vagrantfile, use File.expand_path with __FILE__ variable.
+  
+  config.vm.provision :shell, path: File.expand_path("../bootstrap.sh", __FILE__)
+
+
+Test the new box:
+
+vagrant box add --force --name bentoUbuntu16.04Mean package.box
+cd ..; mkdir test; cd test
+vagrant init bentoUbuntu16.04Mean
+vagrant up
+
+
+--------------------------------------------------
+
+#-----------------------------------------
+# Info:
+# Mongo DB Server Commands and configuration
+#-----------------------------------------
+
+sudo service mongod start <-- Server start
+sudo service mongod stop
+
+mongo <-- Client start
+
+Files:
+
+/etc/mongod.conf
+/var/lib/mongodb <-- Files
+/var/log/mongodb
+
+/lib/systemd/system/mongod.service <-- Autostart config, created by systemctl enable
+/etc/systemd/system/multi-user.target.wants/mongod.service
+
+-------------------------------------------------
+
+Set up mongodb as a service (using SystemD)
+
+Starting with Ubuntu 15.04, Upstart will be deprecated in favor of Systemd. With Systemd to manage the services we can do the following:
+systemctl status mongod
+sudo systemctl start mongod
+sudo systemctl stop mongod
+sudo systemctl restart mongod
+
+sudo systemctl enable mongod <-- Enable the service, persistent.  Requires 
+systemctl is-enabled mongod
+systemctl is-active mongod
+
+Enable the service:
+
+sudo systemctl enable mongod
+Created symlink from /etc/systemd/system/multi-user.target.wants/mongod.service to /lib/systemd/system/mongod.service.
+
+vagrant@vagrant:/etc/systemd/system$ ls /etc/systemd/system/multi-user.target.wants/mongod.service
+lrwxrwxrwx 1 root root 34 Apr 27 05:10 /etc/systemd/system/multi-user.target.wants/mongod.service -> /lib/systemd/system/mongod.service
+
+vagrant@vagrant:/etc/systemd/system$ cat /etc/systemd/system/multi-user.target.wants/mongod.service
+#------------------------
+[Unit]
+Description=High-performance, schema-free document-oriented database
+After=network.target
+Documentation=https://docs.mongodb.org/manual
+
+[Service]
+User=mongodb
+Group=mongodb
+ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=64000
+# processes/threads
+LimitNPROC=64000
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+
+# Recommended limits for for mongod as specified in
+# http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
+
+[Install]
+WantedBy=multi-user.target
+#------------------------
+
+This file has a simple structure:
+
+    The Unit section contains the overview (e.g. a human-readable description for MongoDB service)
+    as well as dependencies that must be satisfied before the service is started. In our case, 
+    MongoDB depends on networking already being available, hence network.target here.
+
+    The Service section how the service should be started. The User directive specifies that the
+    server will be run under the mongodb user, and the ExecStart directive defines the startup
+    command for MongoDB server.
+
+    The last section, Install, tells systemd when the service should be automatically started. 
+    The multi-user.target is a standard system startup sequence, which means the server will be
+    automatically started during boot.
+
+systemctl is-enabled mongod
+enabled
+
+systemctl is-active mongod
+inactive
+
+systemctl status mongod
+  mongod.service - High-performance, schema-free document-oriented database
+   Loaded: loaded (/lib/systemd/system/mongod.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: https://docs.mongodb.org/manual
+
+Apr 27 04:40:13 vagrant systemd[1]: Stopped High-performance, schema-free document-oriented database.
+
+After reboot:
+
+systemctl status mongod
+  mongod.service - High-performance, schema-free document-oriented database
+   Loaded: loaded (/lib/systemd/system/mongod.service; enabled; vendor preset: enabled)
+   Active: active (running) since Thu 2017-04-27 05:18:08 UTC; 1min 24s ago
+     Docs: https://docs.mongodb.org/manual
+ Main PID: 1235 (mongod)
+    Tasks: 20
+   Memory: 62.7M
+      CPU: 1.140s
+   CGroup: /system.slice/mongod.service
+           1235 /usr/bin/mongod --quiet --config /etc/mongod.conf
+
+Apr 27 05:18:08 vagrant systemd[1]: Started High-performance, schema-free document-oriented database.
+
+
+-----------------------------------------------------------
+
+Problem - I changed permissions on some files trying to get it to autostart.
+Uninstalling and reinstalling.  Mongodb wont start.  How to uninstall/reinstall?
+
+https://askubuntu.com/questions/147135/how-can-i-uninstall-mongodb-and-reinstall-the-latest-version
+
+
+------------------------------------------------------------
+
+Generating Mean App:
+
+(Run Cygwin as Administrator)
+
+cd /vagrant/meanApp
+yo meanjs
+..
+..
+
+------------------------------
+Got an error:
+
+Running npm install for you....
+This may take a couple minutes.
+
+------------------------------------------
+Your MEAN.js application is ready!
+
+To Get Started, run the following command:
+
+cd mean && grunt
+
+Happy Hacking!
+------------------------------------------
+vagrant@vagrant:~/meanStack$ cd mean
+vagrant@vagrant:~/meanStack/mean$ grunt
+(node:1944) DeprecationWarning: process.EventEmitter is deprecated. Use require('events') instead.
+Running "env:dev" (env) task
+
+Running "sass:dist" (sass) task
+Warning:
+You need to have Ruby and Sass installed and in your PATH for this task to work.
+More info: https://github.com/gruntjs/grunt-contrib-sass
+ Use --force to continue.
+
+Aborted due to warnings.
+
+
+Installing packages...
+
+npm install grunt-contrib-sass --save-dev
+
+Still same error.
+
+Ruby was not installed.
+
+sudo apt-get install ruby-compass
+
+Now grunt works.
+
+---------------------------------------
+
+---------------------------------
+
+vagrant up - error:
+
+    default: Running: C:/cygwin/tmp/vagrant-shell20170503-6088-1fujaeg.sh
+==> default: ttyname failed: Inappropriate ioctl for device
+
+this happens to me when i call scripts with #!/usr/bin/env bash instead of #!/bin/bash
+
+
+---------------------------------
+
+
+1/28/2018 - Vagrant up gets a error message:
+
+==> default: Booting VM...
+There was an error while executing `VBoxManage`, a CLI used by Vagrant
+for controlling VirtualBox. The command and stderr is shown below.
+
+Command: ["startvm", "3dc7be23-e3bc-4795-aa6a-bdd2e51d67ec", "--type", "headless"]
+
+Stderr: VBoxManage.exe: error: The virtual machine 'WADwithMEAN_default_1494567036536_26699' has terminated unexpectedly during startup with exit code 1 (0x1).  More details may be available in 'C:\Users\publi\VirtualBox VMs\WADwithMEAN_default_1494567036536_26699\Logs\VBoxHardening.log'
+VBoxManage.exe: error: Details: code E_FAIL (0x80004005), component MachineWrap, interface IMachine
+----
+
+Not much info online.  Decided to update Virtual Box to 5.6.2.  After upgrading, vagrant reported:
+
+$ vup
+The provider 'virtualbox' that was requested to back the machine
+'default' is reporting that it isn't usable on this system. The
+reason is shown below:
+
+Vagrant has detected that you have a version of VirtualBox installed
+that is not supported by this version of Vagrant. Please install one of
+the supported versions listed below to use Vagrant:
+
+4.0, 4.1, 4.2, 4.3, 5.0, 5.1
+
+A Vagrant update may also be available that adds support for the version
+you specified. Please check www.vagrantup.com/downloads.html to download
+the latest version.
+-----
+
+Updated vagrant to 2.0.1
+
+Vagrant started ubuntu OK but the login did not show the prompt.  Found there is a bug:
+
+https://github.com/hashicorp/vagrant/issues/9143
+
+Vagrant was using Msys ssh instead of cygwin ssh and TERM was not being set correctly (dumb instead of xterm).  Workaround is to start ssh using this command:
+
+VAGRANT_PREFER_SYSTEM_BIN=1 vagrant ssh
+
+Also export in my local windows cygwin .bashrc:
+
+export VAGRANT_PREFER_SYSTEM_BIN=1
+
+
+
+------------------------------------------------
+
+cygwin vi arrow keys don't work when inserting (get A and B)
+
+Copies basic vim config file from https://gist.github.com/simonista/8703722
+
+to ~/.virc (not .vimrc becaise it's actually vi. I don't have the vim package)
+
+------------------------------------------------
+
+
+bson error on node server start - Update node common libraries (already done once.  Document)  Or just ignore.
+
+ignoring for now.
+
+
+------------------------------------------------
+
+3/6/2018 - Error during vagrant up of a newly installed instance.
+
+==> server1: Running provisioner: shell...
+server1: Running: inline script
+==> server1: Inappropriate ioctl for device
+
+https://github.com/hashicorp/vagrant/issues/7368
+
+Running shell commands during provisioning causes this error.  Seems to start OK though.
+Normally do not see it because provisioning only runs the first time.
+
+Ignore...
+
+-------------------------------------------------
+
+3/6/2018 - Repackaged an existing vagrant instance.  (See bentoUbuntu16.04Mean.setup.txt)
+
+Will not start up. 
+
+==> default: Waiting for machine to boot. This may take a few minutes...
+    default: SSH address: 127.0.0.1:2222
+    default: SSH username: vagrant
+    default: SSH auth method: private key
+    default: Warning: Connection reset. Retrying...
+    default: Warning: Authentication failure. Retrying...
+    default: Warning: Authentication failure. Retrying...
+    default: Warning: Authentication failure. Retrying...
+    default: Warning: Authentication failure. Retrying...
+
+See details in this link, and in VagrantSSHProblems.txt:
+https://github.com/hashicorp/vagrant/issues/5186
+
+Resolved.
+
+---------------------------------------------------
+
+2/6/2019 - Upgrade Vagrant and VirtualBox when using an existing customized vagrant install
+
+VirtualBox version: 5.2.6 to 5.2.26
+	Start VirtualBox, will show a notice of new version.  Download and install.
+
+Vagrant version: 2.0.1 to 2.2.3 (64 bit)
+	Download latest from hashicorp.  MSI file.  Install.
+
+The webdev app worked after the updates without any other changes.
+
+----------------------------------------------------
+
+Creating a new box with updated Ubuntu version:
+
+Check https://www.ubuntu.com/download/desktop for latest version (18.04)
+
+Current version is 16.04.
+
+Go to https://app.vagrantup.com/bento and find ubuntu 18.04.  https://app.vagrantup.com/bento/boxes/ubuntu-18.04
+
+Go to latest version: https://app.vagrantup.com/bento/boxes/ubuntu-18.04/versions/201812.27.0
+
+
+
+
+
+
